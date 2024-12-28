@@ -9,10 +9,10 @@ import theme6 from '../assets/images/theme6.webp'
 import theme7 from '../assets/images/theme7.webp'
 
 export const defaultSettings: ThemeConfig = {
-  title: 'A begineers guide to frontend development',
+  title: '一个标题大大的标题',
   bgColor: '#949ee5',
   pattern: '',
-  author: import.meta.env.REACT_APP_AUTHOR || 'Lruihao',
+  author: import.meta.env.REACT_APP_AUTHOR || '理型健',
   icon: { label: 'reactjs', value: 'react', opts: ['original', 'original-wordmark'] },
   iconStyle: 'original',
   iconStyleOptions: ['original', 'original-wordmark'],

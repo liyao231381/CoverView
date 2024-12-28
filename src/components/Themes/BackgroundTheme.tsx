@@ -1,6 +1,6 @@
 import type { ColorId, Orientation } from 'unsplash-js';
 import type { ThemeProps } from './themeProps';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import fixitIcon from '../../assets/icons/fixit.svg';
 import hugoIcon from '../../assets/icons/hugo.svg';
@@ -10,6 +10,7 @@ import { downloadRawImage } from '../../services/downloadRawImage';
 import { type BasicPhoto, getPhotos, type GetPhotosOptions } from '../../services/unsplash';
 import { ImgContext } from '../ImgContext';
 import Pagination from '../Pagination';
+import { getPasteImage } from '../../services/getPasteImage';
 
 function BackgroundTheme({ config }: ThemeProps) {
   const { t } = useTranslation();
@@ -26,6 +27,42 @@ function BackgroundTheme({ config }: ThemeProps) {
   const [resultColor, setResultColor] = useState<ColorId | 'all'>('all');
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const { unsplashImage, setUnsplashImage } = useContext(ImgContext);
+  
+  const handlePaste = useCallback(async (e: ClipboardEvent) => {
+    const url = await getPasteImage(e);
+    setUploadedImage(url);
+  }, []);
+
+  const handleDrop = useCallback((e: DragEvent) => {
+    e.preventDefault();
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setUploadedImage(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  }, []);
+
+  const handleDragOver = useCallback((e: DragEvent) => {
+    e.preventDefault(); // Prevent default to allow drop
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('paste', handlePaste);
+    document.addEventListener('drop', handleDrop);
+    document.addEventListener('dragover', handleDragOver);
+    
+    return () => {
+      document.removeEventListener('paste', handlePaste);
+      document.removeEventListener('drop', handleDrop);
+      document.removeEventListener('dragover', handleDragOver);
+    };
+  }, [handlePaste, handleDrop, handleDragOver]);
 
   const searchImages = (resetPage = false) => {
     if (resetPage) {
@@ -176,6 +213,7 @@ function BackgroundTheme({ config }: ThemeProps) {
         {/* 图片选择和搜索功能 */}
         <div className={`${uploadedImage || unsplashImage ? 'hidden' : 'flex'} h-full flex-col p-1 md:p-4 bg-white items-center justify-around gap-1 md:gap-2 relative download-ignore`}>
           <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
+            <span className="bg-white bg-opacity-50 backdrop-blur-md text-gray-700 mr-2 p-2 rounded">Ctrl+V、拖入或点击</span> {/* 增加的文本，带背景模糊效果 */}
             <input
               type="file"
               accept="image/*"
