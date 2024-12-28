@@ -39,9 +39,9 @@ function Pagination({ page, pageSize, total, pagerCount, pagination, className }
   )
 
   return (
-    <div className={`hidden sm:flex sm:items-center sm:justify-between bg-white p-2 h-max w-full shrink-0 ${className}`}>
+    <div className={`hidden sm:flex sm:items-center sm:justify-between bg-[rgba(255,255,255,0.2)] p-2 h-max w-full shrink-0 ${className}`}>
       <div>
-        <p className="text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: t('pagination.summary', { page, totalPages, total }) }} />
+        <p className="text-sm text-white" dangerouslySetInnerHTML={{ __html: t('pagination.summary', { page, totalPages, total }) }} />
       </div>
       <nav aria-label="Pagination" className="isolate inline-flex -space-x-px rounded-md shadow-sm">
         <button

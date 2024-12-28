@@ -136,7 +136,7 @@ function BackgroundTheme({ config }: ThemeProps) {
             className="object-cover h-full w-full"
             src={uploadedImage || unsplashImage?.url}
           />
-          <div className="backdrop-blur-sm h-full w-full bg-gray-800/60 absolute">
+          <div className="backdrop-blur-sm h-full w-full bg-gray-800/20 absolute">
             <button type="button" className="absolute top-2 right-2 cursor-pointer download-ignore" onClick={() => {
               setUploadedImage(null);
               setUnsplashImage(null);
@@ -212,8 +212,7 @@ function BackgroundTheme({ config }: ThemeProps) {
 
         {/* 图片选择和搜索功能 */}
         <div className={`${uploadedImage || unsplashImage ? 'hidden' : 'flex'} h-full flex-col p-1 md:p-4 bg-white items-center justify-around gap-1 md:gap-2 relative download-ignore`}>
-          <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
-            <span className="bg-white bg-opacity-50 backdrop-blur-md text-gray-700 mr-2 p-2 rounded">Ctrl+V、拖入或点击</span> {/* 增加的文本，带背景模糊效果 */}
+          <div className="absolute top-2 flex items-center gap-2 z-10">
             <input
               type="file"
               accept="image/*"
@@ -221,15 +220,16 @@ function BackgroundTheme({ config }: ThemeProps) {
               className="hidden"
               id="upload-image-input"
             />
-            <label htmlFor="upload-image-input" className="cursor-pointer bg-blue-500 text-white py-2 px-4 rounded">
+            <label htmlFor="upload-image-input" className="cursor-pointer bg-[#0055ff] text-white py-2 px-4 rounded">
               上传图片
             </label>
+            <span className="bg-[rgba(255,255,255,0.2)] bg-opacity-40 text-white/80 mr-2 p-2 rounded">Ctrl+V或者拖入</span> {/* 增加的文本，带背景模糊效果 */}
             <form
-              className="flex bg-gray-50 rounded-full border"
+              className="flex bg-[rgba(255,255,255,0.2)] rounded-full border"
               onSubmit={e => e.preventDefault()}
             >
               <select
-                className="focus:outline-none bg-gray-50 py-1 px-2 md:px-4 rounded-l-full"
+                className="focus:outline-none bg-[rgba(255,255,255,0)] py-1 px-2 md:px-4 rounded-l-full"
                 value={orientation}
                 onChange={e => setOrientation(e.target.value as Orientation)}
               >
@@ -238,7 +238,7 @@ function BackgroundTheme({ config }: ThemeProps) {
                 ))}
               </select>
               <select
-                className="focus:outline-none bg-gray-50 py-1 px-2 md:px-4 w-24"
+                className="focus:outline-none bg-[rgba(255,255,255,0)] py-1 px-2 md:px-4 w-24"
                 value={resultColor}
                 onChange={e => setResultColor(e.target.value as ColorId)}
               >
@@ -247,7 +247,7 @@ function BackgroundTheme({ config }: ThemeProps) {
                 ))}
               </select>
               <input
-                className="focus:outline-none w-full text-lg bg-gray-50 py-1 px-2 md:px-4 rounded-full border border-gray-50"
+                className="focus:outline-none w-full text-lg bg-[rgba(255,255,255,0)] py-1 px-2 md:px-4 rounded-full border border-gray-50"
                 placeholder={t('editor.searchPlaceholder')}
                 type="text"
                 value={searchText}
@@ -255,7 +255,7 @@ function BackgroundTheme({ config }: ThemeProps) {
               />
               <button type="submit" onClick={() => searchImages(true)}>
                 <svg
-                  className="w-8 h-8 m-1 p-2 bg-gray-700 hover:bg-gray-800 text-white rounded-full"
+                  className="w-8 h-8 m-1 p-2 bg-gray-700 hover:bg-[rgba(255,255,255,0.2)] text-white rounded-full"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -287,7 +287,7 @@ function BackgroundTheme({ config }: ThemeProps) {
             </div>
           )}
 
-          <div className="overflow-y-scroll overflow-x-hidden h-96 justify-center flex flex-wrap w-full">
+          <div className="overflow-y-scroll overflow-x-hidden h-full justify-center flex flex-wrap w-full">
             {imageList.map((image) => {
               return (
                 <div className="unsplash-image-container w-1/3 h-40 cursor-pointer relative" key={image.id}>
@@ -299,7 +299,7 @@ function BackgroundTheme({ config }: ThemeProps) {
                   />
                   <button
                     type="button"
-                    className="hidden border p-1 bg-gray-700 hover:bg-gray-800 text-white rounded-lg absolute bottom-2 right-2"
+                    className="hidden border p-1 bg-[rgba(255,255,255,0.2)] hover:bg-white/50 text-white rounded-lg absolute bottom-2 right-2"
                     disabled={downloading}
                     onClick={() => downloadImage(image)}
                   >

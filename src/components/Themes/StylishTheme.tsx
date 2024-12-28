@@ -1,65 +1,101 @@
-import type { ColorId, Orientation } from 'unsplash-js'
-import type { ThemeProps } from './themeProps'
-import { useContext, useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import fixitIcon from '../../assets/icons/fixit.svg'
-import hugoIcon from '../../assets/icons/hugo.svg'
-import emptyImg from '../../assets/images/empty.svg'
-import { orientationOptions, resultColorOptions } from '../../common'
-import { downloadRawImage } from '../../services/downloadRawImage'
-import { type BasicPhoto, getPhotos, type GetPhotosOptions } from '../../services/unsplash'
-import { ImgContext } from '..//ImgContext'
-import Pagination from '../Pagination'
+import type { ColorId, Orientation } from 'unsplash-js';
+import type { ThemeProps } from './themeProps';
+import { useContext, useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import fixitIcon from '../../assets/icons/fixit.svg';
+import hugoIcon from '../../assets/icons/hugo.svg';
+import emptyImg from '../../assets/images/empty.svg';
+import { orientationOptions, resultColorOptions } from '../../common';
+import { downloadRawImage } from '../../services/downloadRawImage';
+import { type BasicPhoto, getPhotos, type GetPhotosOptions } from '../../services/unsplash';
+import { ImgContext } from '../ImgContext';
+import Pagination from '../Pagination';
+import { getPasteImage } from '../../services/getPasteImage';
 
 function StylishTheme({ config }: ThemeProps) {
-  const { t } = useTranslation()
-  const { title, author, font, icon, customIcon, bgColor } = config
-  const fontBold = font !== 'font-Virgil' ? 'font-bold' : ''
-  const [imageList, setImageList] = useState<BasicPhoto[]>([])
-  const [total, setTotal] = useState(0)
-  const [page, setPage] = useState(1)
-  const pageSize = 30
-  const [loading, setLoading] = useState(false)
-  const [downloading, setDownloading] = useState(false)
-  const [searchText, setSearchText] = useState('setup')
-  const [orientation, setOrientation] = useState<Orientation | 'all'>('all')
-  const [resultColor, setResultColor] = useState<ColorId | 'all'>('all')
-  const { unsplashImage, setUnsplashImage } = useContext(ImgContext)
+  const { t } = useTranslation();
+  const { title, author, font, icon, customIcon, bgColor } = config;
+  const fontBold = font !== 'font-Virgil' ? 'font-bold' : '';
+  const [imageList, setImageList] = useState<BasicPhoto[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const pageSize = 30;
+  const [loading, setLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [searchText, setSearchText] = useState('setup');
+  const [orientation, setOrientation] = useState<Orientation | 'all'>('all');
+  const [resultColor, setResultColor] = useState<ColorId | 'all'>('all');
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const { unsplashImage, setUnsplashImage } = useContext(ImgContext);
+
+  const handlePaste = useCallback(async (e: ClipboardEvent) => {
+    const url = await getPasteImage(e);
+    setUploadedImage(url);
+  }, []);
+
+  const handleDrop = useCallback((e: DragEvent) => {
+    e.preventDefault();
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setUploadedImage(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  }, []);
+
+  const handleDragOver = useCallback((e: DragEvent) => {
+    e.preventDefault(); // Prevent default to allow drop
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('paste', handlePaste);
+    document.addEventListener('drop', handleDrop);
+    document.addEventListener('dragover', handleDragOver);
+    
+    return () => {
+      document.removeEventListener('paste', handlePaste);
+      document.removeEventListener('drop', handleDrop);
+      document.removeEventListener('dragover', handleDragOver);
+    };
+  }, [handlePaste, handleDrop, handleDragOver]);
 
   const searchImages = (resetPage = false) => {
-    // 重置页码
     if (resetPage) {
-      setPage(1)
+      setPage(1);
     }
-    setLoading(true)
+    setLoading(true);
     const query: GetPhotosOptions = {
       query: searchText,
       page,
       perPage: pageSize,
-    }
+    };
     if (orientation && orientation !== 'all') {
-      query.orientation = orientation
+      query.orientation = orientation;
     }
     if (resultColor && resultColor !== 'all') {
-      query.color = resultColor
+      query.color = resultColor;
     }
     getPhotos(query).then((response) => {
-      setLoading(false)
+      setLoading(false);
       if (response.status !== 200) {
-        return console.error('Failed to fetch images!', response.errors)
+        return console.error('Failed to fetch images!', response.errors);
       }
       if (response.response) {
-        setTotal(response.response.total)
-        setImageList(response.response.results)
+        setTotal(response.response.total);
+        setImageList(response.response.results);
       }
-    })
-  }
+    });
+  };
 
-  // 页码变化时重新搜索
   useEffect(() => {
-    searchImages()
+    searchImages();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page])
+  }, [page]);
 
   const selectImage = (image: BasicPhoto) => {
     setUnsplashImage({
@@ -68,17 +104,28 @@ function StylishTheme({ config }: ThemeProps) {
       avatar: image.user.profile_image.small,
       profile: `${image.user.links.html}?utm_source=https://coverview.lruihao.cn&utm_medium=referral`,
       downloadLink: image.links.download_location,
-    })
-  }
+    });
+  };
 
   const downloadImage = (image: BasicPhoto) => {
-    setDownloading(true)
+    setDownloading(true);
     downloadRawImage(image.urls.raw, image.id).then(() => {
-      setDownloading(false)
+      setDownloading(false);
     }).catch((error) => {
-      console.error('Failed to download image!', error)
-    })
-  }
+      console.error('Failed to download image!', error);
+    });
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadedImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div
@@ -87,8 +134,8 @@ function StylishTheme({ config }: ThemeProps) {
     >
       <div className="flex flex-row items-center bg-white justify-center h-full">
         <div className="h-full w-1/2 bg-white rounded-l-xl">
-          <div className={`${font} px-12 justify-center gap-10 text-left rounded-xl h-full p-4 flex flex-col`}>
-            <h1 className={`whitespace-pre-wrap text-4xl text-gray-800 ${fontBold}`}>{title}</h1>
+          <div className={`${font} px-6 justify-center gap-10 text-left rounded-xl h-full p-4 flex flex-col`}>
+            <h1 className={`whitespace-pre-wrap text-4xl text-gray-800 ${fontBold} w-[calc(100%+1rem)] `}>{title}</h1>
             <div className="flex items-center text-left">
               {customIcon && <img alt="Custom Icon" className="w-8 h-8 mr-2" src={customIcon} />}
               {icon.value === 'custom' && !customIcon && <i className="h-8" />}
@@ -107,21 +154,22 @@ function StylishTheme({ config }: ThemeProps) {
                   src={`https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${icon.value}/${icon.value}-${icon.opts[0]}.svg`}
                 />
               )}
-
               <h2 className="text-xl font-semibold text-left">{author}</h2>
             </div>
           </div>
         </div>
-        <div className="h-full w-1/2">
+        <div className="h-full w-3/5">
           {/* 预览图片 */}
-          <div className={`${unsplashImage ? 'flex' : 'hidden'} h-full relative group`}>
+          <div className={`${uploadedImage || unsplashImage ? 'flex' : 'hidden'} h-full relative group`}>
             <img
               alt="preview"
               className="object-cover h-full w-full"
-              src={unsplashImage?.url}
+              src={uploadedImage || unsplashImage?.url}
             />
-
-            <button type="button" className="absolute top-2 right-2 cursor-pointer download-ignore" onClick={() => setUnsplashImage(null)}>
+            <button type="button" className="absolute top-2 right-2 cursor-pointer download-ignore" onClick={() => {
+              setUploadedImage(null);
+              setUnsplashImage(null);
+            }}>
               <svg
                 className="group-hover:inline-block hidden w-8 h-8 text-gray-800 bg-white p-2 rounded-full z-10"
                 fill="none"
@@ -132,7 +180,6 @@ function StylishTheme({ config }: ThemeProps) {
                 <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
               </svg>
             </button>
-
             <div className="absolute bottom-2 right-2 opacity-80 download-ignore">
               <div className="group-hover:flex hidden items-center">
                 <span className="text-sm text-white mx-2">Photo by</span>
@@ -154,54 +201,72 @@ function StylishTheme({ config }: ThemeProps) {
             </div>
           </div>
           {/* 图片列表 */}
-          <div className={`${unsplashImage ? 'hidden' : 'flex'} h-full flex-col p-1 md:p-4 bg-white items-center justify-around gap-1 md:gap-2 relative download-ignore`}>
-            <form
-              className="flex bg-gray-50 rounded-full border"
-              onSubmit={e => e.preventDefault()}
-            >
-              <select
-                className="focus:outline-none bg-gray-50 py-1 px-2 md:px-4 rounded-l-full"
-                value={orientation}
-                onChange={e => setOrientation(e.target.value as Orientation)}
-              >
-                {orientationOptions.map(option => (
-                  <option key={option} value={option}>{t(`orientation.${option}`)}</option>
-                ))}
-              </select>
-              <select
-                className="focus:outline-none bg-gray-50 py-1 px-2 md:px-4 w-24"
-                value={resultColor}
-                onChange={e => setResultColor(e.target.value as ColorId)}
-              >
-                {resultColorOptions.map(color => (
-                  <option key={color} value={color}>{t(`resultColors.${color}`)}</option>
-                ))}
-              </select>
+          <div className={`${uploadedImage || unsplashImage ? 'hidden' : 'flex'} h-full flex-col p-1 md:p-4 bg-white items-center justify-around gap-1 md:gap-2 relative download-ignore`}>
+            <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
               <input
-                className="focus:outline-none w-full text-lg bg-gray-50 p-1 px-4 rounded-full border border-gray-50"
-                placeholder={t('editor.searchPlaceholder')}
-                type="text"
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+                id="upload-image-input"
               />
-
-              <button type="submit" onClick={() => searchImages(true)}>
-                <svg
-                  className="w-8 h-8 m-1 p-2 bg-gray-700 hover:bg-gray-800 text-white rounded-full"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
+              <label htmlFor="upload-image-input" className="cursor-pointer bg-[#0055ff] text-white py-2 px-4 rounded whitespace-nowrap">
+                上传图片
+              </label>
+              <form
+                className="flex bg-[rgba(255,255,255,0.2)] rounded-full border"
+                onSubmit={e => e.preventDefault()}
+              >
+                <select
+                  className="focus:outline-none bg-[rgba(255,255,255,0)] py-1 px-2 md:px-4 rounded-l-full"
+                  value={orientation}
+                  onChange={e => setOrientation(e.target.value as Orientation)}
                 >
-                  <path
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                  />
-                </svg>
-              </button>
-            </form>
+                  {orientationOptions.map(option => (
+                    <option key={option} value={option}>{t(`orientation.${option}`)}</option>
+                  ))}
+                </select>
+                <select
+                  className="focus:outline-none bg-[rgba(255,255,255,0)] py-1 px-2 md:px-4 w-24"
+                  value={resultColor}
+                  onChange={e => setResultColor(e.target.value as ColorId)}
+                >
+                  {resultColorOptions.map(color => (
+                    <option key={color} value={color}>{t(`resultColors.${color}`)}</option>
+                  ))}
+                </select>
+                <input
+                  className="focus:outline-none w-full text-lg bg-[rgba(255,255,255,0)] py-1 px-2 md:px-4 rounded-full border border-gray-50"
+                  placeholder={t('editor.searchPlaceholder')}
+                  type="text"
+                  value={searchText}
+                  onChange={e => setSearchText(e.target.value)}
+                />
+                <button type="submit" onClick={() => searchImages(true)}>
+                  <svg
+                    className="w-8 h-8 m-1 p-2 bg-gray-700 hover:bg-gray-800 text-white rounded-full"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                    />
+                  </svg>
+                </button>
+              </form>
+            </div>
+
+            {/* 新增的提示文本 */}
+            <div className="absolute top-13 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+              <span className="text-white backdrop-blur-sm p-2 rounded">
+                Ctrl+V粘贴或拖入图片
+              </span>
+            </div>
 
             {loading && (
               <div className="absolute h-full inset-0 flex items-center justify-center bg-white/50 z-10">
@@ -246,7 +311,7 @@ function StylishTheme({ config }: ThemeProps) {
                       </svg>
                     </button>
                   </div>
-                )
+                );
               })}
               {imageList.length === 0 && (
                 <div className="text-sm text-gray-400 w-full h-60 flex flex-col items-center justify-center gap-2">
@@ -267,7 +332,7 @@ function StylishTheme({ config }: ThemeProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default StylishTheme
+export default StylishTheme;

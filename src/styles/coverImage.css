@@ -30,6 +30,13 @@
   --cv-width: 800px;
 }
 
+/* frequently used sizes */
+.size-9\:16 {
+  --cv-platform-x: 9;
+  --cv-platform-y: 16;
+  --cv-width: 405px;
+}
+
 .size-5\:4 {
   --cv-platform-x: 5;
   --cv-platform-y: 4;
