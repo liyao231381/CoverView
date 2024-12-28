@@ -14,17 +14,17 @@ import theme7 from '../assets/images/theme7.webp'
 // 默认设置的主题配置
 export const defaultSettings: ThemeConfig = {
   title: '一个标题大大的标题', // 主题标题
-  bgColor: '#949ee5', // 背景颜色
+  bgColor: '#ffa500', // 背景颜色
   pattern: '', // 背景图案
-  author: import.meta.env.REACT_APP_AUTHOR || '理型健', // 作者信息
-  icon: { label: 'reactjs', value: 'react', opts: ['original', 'original-wordmark'] }, // 图标设置
+  author: import.meta.env.REACT_APP_AUTHOR || '理 · 型 · 健', // 作者信息
+  icon: { label: 'github', value: 'github', opts: ['original', 'original-wordmark'] }, // 图标设置
   iconStyle: 'original', // 图标样式
   iconStyleOptions: ['original', 'original-wordmark'], // 可选图标样式
-  font: 'font-Virgil', // 字体
+  font: 'font-Anek', // 字体
   theme: 'background', // 主题类型
   customIcon: '', // 自定义图标
   platform: 'size-16:9', // 平台设置
-  customPlatformWidth: 1024, // 自定义平台宽度
+  customPlatformWidth: 1440, // 自定义平台宽度
   customPlatformX: 0, // 自定义平台X坐标
   customPlatformY: 0, // 自定义平台Y坐标
 }
@@ -66,8 +66,8 @@ export const patternOptions: ThemePattern[] = [
 
 // 平台选项
 export const platformOptions: { label: string, value: string }[] = [
-  { label: '16:9横', value: 'size-16:9' },
-  { label: '9:16竖', value: 'size-9:16' },
+  { label: '16:9', value: 'size-16:9' },
+  { label: '9:16', value: 'size-9:16' },
   { label: '5:4', value: 'size-5:4' },
   { label: '7:5', value: 'size-7:5' },
   { label: '4:3', value: 'size-4:3' },

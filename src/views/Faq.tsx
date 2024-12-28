@@ -17,7 +17,7 @@ function Faq() {
           <h1 className="font-bold md:text-4xl text-2xl font-Anek text-center">{t('faq.title')}</h1>
           <Link
             className="hover:translate-x-2 duration-300 bg-indigo-400 hover:bg-indigo-500 group rounded-full px-6 py-2 text-white text-sm mx-auto font-Inter font-semibold"
-            to="/editor"
+            to="/"
           >
             {t('home.openEditor')}
             {' '}

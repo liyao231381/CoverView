@@ -7,7 +7,7 @@ function Header() {
   const { t } = useTranslation()
   return (
     <div className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 text-xl md:px-2 flex border-b border-gray-100 p-2 w-full">
-      <Link className="flex items-center" to="/">
+      <Link className="flex items-center" to="/home">
         <img alt="logo" className="w-8 h-8 mx-2" src={logo} />
         <h1 className="font-semibold">CoverView</h1>
       </Link>

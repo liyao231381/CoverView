@@ -41,7 +41,7 @@ function Home() {
 
       <div className="mx-auto md:px-20 py-6 flex flex-col items-center">
         <h1 className="md:w-7/12 m-10 text-center md:text-5xl text-3xl font-extrabold text-gray-700 font-Anek">{t('home.description')}</h1>
-        <Link className="hover:translate-x-2 duration-300 bg-gray-700 hover:bg-gray-800 group rounded-full px-4 md:px-8 text-white md:text-2xl text-lg mx-auto font-Inter font-semibold md:p-4 p-2" to="/editor">
+        <Link className="hover:translate-x-2 duration-300 bg-gray-700 hover:bg-gray-800 group rounded-full px-4 md:px-8 text-white md:text-2xl text-lg mx-auto font-Inter font-semibold md:p-4 p-2" to="/">
           <span className="md:text-2xl text-lg">
             {t('home.openEditor')}
             {' '}
@@ -184,7 +184,7 @@ function Home() {
         <div className="md:w-8/12 mx-auto pt-24 p-4">
           <h2 className="text-6xl text-center font-Anek font-bold text-gray-700 mx-auto">{t('home.summary.title')}</h2>
           <p className="text-2xl text-center py-4 md:w-8/12 mx-auto">{t('home.summary.content')}</p>
-          <Link to="/editor">
+          <Link to="/">
             <button type="button" className="flex mx-auto my-4 hover:translate-x-2 duration-300 bg-gray-700  rounded-full px-6 text-white text-xl font-Inter font-semibold p-4">
               {t('home.tryItNow')}
               {' '}
