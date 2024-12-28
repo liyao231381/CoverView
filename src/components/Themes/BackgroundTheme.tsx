@@ -1,65 +1,63 @@
-import type { ColorId, Orientation } from 'unsplash-js'
-import type { ThemeProps } from './themeProps'
-import { useContext, useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import fixitIcon from '../../assets/icons/fixit.svg'
-import hugoIcon from '../../assets/icons/hugo.svg'
-import emptyImg from '../../assets/images/empty.svg'
-import { orientationOptions, resultColorOptions } from '../../common'
-import { downloadRawImage } from '../../services/downloadRawImage'
-import { type BasicPhoto, getPhotos, type GetPhotosOptions } from '../../services/unsplash'
-import { ImgContext } from '../ImgContext'
-import Pagination from '../Pagination'
+import type { ColorId, Orientation } from 'unsplash-js';
+import type { ThemeProps } from './themeProps';
+import { useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import fixitIcon from '../../assets/icons/fixit.svg';
+import hugoIcon from '../../assets/icons/hugo.svg';
+import emptyImg from '../../assets/images/empty.svg';
+import { orientationOptions, resultColorOptions } from '../../common';
+import { downloadRawImage } from '../../services/downloadRawImage';
+import { type BasicPhoto, getPhotos, type GetPhotosOptions } from '../../services/unsplash';
+import { ImgContext } from '../ImgContext';
+import Pagination from '../Pagination';
 
 function BackgroundTheme({ config }: ThemeProps) {
-  const { t } = useTranslation()
-  const { title, author, font, icon, customIcon } = config
-  const fontBold = font !== 'font-Virgil' ? 'font-bold' : ''
-  const [imageList, setImageList] = useState<BasicPhoto[]>([])
-  const [total, setTotal] = useState(0)
-  const [page, setPage] = useState(1)
-  const pageSize = 30
-  const [loading, setLoading] = useState(false)
-  const [downloading, setDownloading] = useState(false)
-  const [searchText, setSearchText] = useState('setup')
-  const [orientation, setOrientation] = useState<Orientation | 'all'>('all')
-  const [resultColor, setResultColor] = useState<ColorId | 'all'>('all')
-  const { unsplashImage, setUnsplashImage } = useContext(ImgContext)
+  const { t } = useTranslation();
+  const { title, author, font, icon, customIcon } = config;
+  const fontBold = font !== 'font-Virgil' ? 'font-bold' : '';
+  const [imageList, setImageList] = useState<BasicPhoto[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const pageSize = 30;
+  const [loading, setLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [searchText, setSearchText] = useState('setup');
+  const [orientation, setOrientation] = useState<Orientation | 'all'>('all');
+  const [resultColor, setResultColor] = useState<ColorId | 'all'>('all');
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const { unsplashImage, setUnsplashImage } = useContext(ImgContext);
 
   const searchImages = (resetPage = false) => {
-    // 重置页码
     if (resetPage) {
-      setPage(1)
+      setPage(1);
     }
-    setLoading(true)
+    setLoading(true);
     const query: GetPhotosOptions = {
       query: searchText,
       page,
       perPage: pageSize,
-    }
+    };
     if (orientation && orientation !== 'all') {
-      query.orientation = orientation
+      query.orientation = orientation;
     }
     if (resultColor && resultColor !== 'all') {
-      query.color = resultColor
+      query.color = resultColor;
     }
     getPhotos(query).then((response) => {
-      setLoading(false)
+      setLoading(false);
       if (response.status !== 200) {
-        return console.error('Failed to fetch images!', response.errors)
+        return console.error('Failed to fetch images!', response.errors);
       }
       if (response.response) {
-        setTotal(response.response.total)
-        setImageList(response.response.results)
+        setTotal(response.response.total);
+        setImageList(response.response.results);
       }
-    })
-  }
+    });
+  };
 
-  // 页码变化时重新搜索
   useEffect(() => {
-    searchImages()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page])
+    searchImages();
+  }, [page]);
 
   const selectImage = (image: BasicPhoto) => {
     setUnsplashImage({
@@ -68,31 +66,44 @@ function BackgroundTheme({ config }: ThemeProps) {
       avatar: image.user.profile_image.small,
       profile: `${image.user.links.html}?utm_source=https://coverview.lruihao.cn&utm_medium=referral`,
       downloadLink: image.links.download_location,
-    })
-  }
+    });
+  };
 
   const downloadImage = (image: BasicPhoto) => {
-    setDownloading(true)
+    setDownloading(true);
     downloadRawImage(image.urls.raw, image.id).then(() => {
-      setDownloading(false)
+      setDownloading(false);
     }).catch((error) => {
-      console.error('Failed to download image!', error)
-    })
-  }
+      console.error('Failed to download image!', error);
+    });
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadedImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div className="theme-background overflow-y-hidden flex flex-col rounded h-full">
       <div className="h-full bg-white">
         {/* 预览图片 */}
-        <div className={`${unsplashImage ? 'flex' : 'hidden'} h-full relative group`}>
+        <div className={`${uploadedImage || unsplashImage ? 'flex' : 'hidden'} h-full relative group`}>
           <img
             alt="preview"
             className="object-cover h-full w-full"
-            src={unsplashImage?.url}
+            src={uploadedImage || unsplashImage?.url}
           />
-
           <div className="backdrop-blur-sm h-full w-full bg-gray-800/60 absolute">
-            <button type="button" className="absolute top-2 right-2 cursor-pointer download-ignore" onClick={() => setUnsplashImage(null)}>
+            <button type="button" className="absolute top-2 right-2 cursor-pointer download-ignore" onClick={() => {
+              setUploadedImage(null);
+              setUnsplashImage(null);
+            }}>
               <svg
                 className="group-hover:inline-block hidden w-8 h-8 text-gray-800 bg-white p-2 rounded-full z-10"
                 fill="none"
@@ -161,14 +172,20 @@ function BackgroundTheme({ config }: ThemeProps) {
             </div>
           </div>
         </div>
-        {/* 图片列表 */}
-        <div className={`${unsplashImage ? 'hidden' : 'flex'} h-full flex-col p-1 md:p-4 bg-white items-center justify-around gap-1 md:gap-2 relative download-ignore`}>
-          <div className="flex flex-wrap items-center justify-center md:justify-between w-full px-2">
-            <div className="text-lg font-semibold text-gray-700">
-              {t('editor.selectImgTips')}
-              {' '}
-              👇
-            </div>
+
+        {/* 图片选择和搜索功能 */}
+        <div className={`${uploadedImage || unsplashImage ? 'hidden' : 'flex'} h-full flex-col p-1 md:p-4 bg-white items-center justify-around gap-1 md:gap-2 relative download-ignore`}>
+          <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+              id="upload-image-input"
+            />
+            <label htmlFor="upload-image-input" className="cursor-pointer bg-blue-500 text-white py-2 px-4 rounded">
+              上传图片
+            </label>
             <form
               className="flex bg-gray-50 rounded-full border"
               onSubmit={e => e.preventDefault()}
@@ -198,7 +215,6 @@ function BackgroundTheme({ config }: ThemeProps) {
                 value={searchText}
                 onChange={e => setSearchText(e.target.value)}
               />
-
               <button type="submit" onClick={() => searchImages(true)}>
                 <svg
                   className="w-8 h-8 m-1 p-2 bg-gray-700 hover:bg-gray-800 text-white rounded-full"
@@ -217,6 +233,7 @@ function BackgroundTheme({ config }: ThemeProps) {
               </button>
             </form>
           </div>
+
           {loading && (
             <div className="absolute h-full inset-0 flex items-center justify-center bg-white/50 z-10">
               <svg
@@ -260,7 +277,7 @@ function BackgroundTheme({ config }: ThemeProps) {
                     </svg>
                   </button>
                 </div>
-              )
+              );
             })}
             {imageList.length === 0 && (
               <div className="text-sm text-gray-400 w-full h-60 flex flex-col items-center justify-center gap-2">
@@ -280,7 +297,7 @@ function BackgroundTheme({ config }: ThemeProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default BackgroundTheme
+export default BackgroundTheme;
