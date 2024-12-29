@@ -27,14 +27,14 @@
 .size-16\:9 {
   --cv-platform-x: 16;
   --cv-platform-y: 9;
-  --cv-width: 800px;
+  --cv-width: 1920px;
 }
 
 /* frequently used sizes */
 .size-9\:16 {
   --cv-platform-x: 9;
   --cv-platform-y: 16;
-  --cv-width: 405px;
+  --cv-width: 1080px;
 }
 
 .size-5\:4 {
@@ -80,7 +80,7 @@
 }
 
 /* md */
-@media (min-width: 768px) {
+@media (min-width: 1200px) {
   .coverview-preview-container {
     width: min(100%, var(--cv-width));
   }
