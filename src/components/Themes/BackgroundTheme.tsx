@@ -159,7 +159,7 @@ function BackgroundTheme({ config }: ThemeProps) {
             <div className={`${font} rounded-xl h-full p-4 flex flex-col justify-center gap-12`}>
               <h1 className={`whitespace-pre-wrap md:text-5xl text-center text-2xl text-white ${fontBold}`}>{title}</h1>
               <div className="flex flex-col items-center">
-                <h2 className="text-xl font-semibold text-white">{author}</h2>
+                <h2 className="text-xl font-semibold text-white" style={{ whiteSpace: 'nowrap' }}>{author}</h2>
                 {customIcon && (
                   <img alt="Custom Icon" className="w-10 h-10 m-2" src={customIcon} />
                 )}
