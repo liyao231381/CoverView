@@ -136,7 +136,7 @@ function BackgroundTheme({ config }: ThemeProps) {
             className="object-cover h-full w-full"
             src={uploadedImage || unsplashImage?.url}
           />
-          <div className="backdrop-blur-sm h-full w-full bg-gray-800/20 absolute">
+          <div className="h-full w-full bg-black bg-opacity-25 absolute">
             <button type="button" className="absolute top-2 right-2 cursor-pointer download-ignore" onClick={() => {
               setUploadedImage(null);
               setUnsplashImage(null);

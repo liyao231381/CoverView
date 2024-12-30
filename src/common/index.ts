@@ -17,7 +17,7 @@ export const defaultSettings: ThemeConfig = {
   bgColor: '#ffa500', // 背景颜色
   pattern: '', // 背景图案
   author: import.meta.env.REACT_APP_AUTHOR || '理 · 型 · 健', // 作者信息
-  icon: { label: 'github', value: 'github', opts: ['original', 'original-wordmark'] }, // 图标设置
+  icon: { label: '理型健', value: 'custom', opts: [] }, // 图标设置
   iconStyle: 'original', // 图标样式
   iconStyleOptions: ['original', 'original-wordmark'], // 可选图标样式
   font: 'font-Anek', // 字体

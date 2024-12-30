@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next'
 import { toImage, type ToImageOptions } from '../services/toImage'
 
 const downloadFmtOptions: { label: string, value: DownloadFormat }[] = [
+  { label: 'SVG', value: 'svg' },
   { label: 'PNG', value: 'png' },
   { label: 'JPEG', value: 'jpeg' },
-  { label: 'SVG', value: 'svg' },
   { label: 'Blob', value: 'blob' },
 ]
 
@@ -64,7 +64,7 @@ function DownloadIcon({ loading, downloadFmt }: DownloadIconProps) {
 function ComponentToImg({ children }: PropsWithChildren) {
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
-  const [downloadFmt, setDownloadFmt] = useState<DownloadFormat>('png')
+  const [downloadFmt, setDownloadFmt] = useState<DownloadFormat>('svg')
   const [quality, setQuality] = useState(1)
   const componentRef = useRef<HTMLDivElement | null>(null)
 

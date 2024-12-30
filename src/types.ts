@@ -1,4 +1,4 @@
-export type DownloadFormat = 'png' | 'jpeg' | 'svg' | 'blob'
+export type DownloadFormat = 'svg' | 'png' | 'jpeg' | 'blob'
 
 export interface ColorTheme {
   bgColor: string
